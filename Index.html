@@ -138,6 +138,110 @@ function trade(type) {
     total.toFixed(2) + ' دلار';
 
   history.prepend(row);
+
+<script>
+const apiKey = 'کلید_Demo_جدید_خودت';
+
+let isLoadingPrices = false;
+
+async function loadCryptoPrice() {
+  const box = document.getElementById('realPrices');
+
+  if (isLoadingPrices) return;
+  isLoadingPrices = true;
+
+  box.textContent = 'در حال دریافت قیمت واقعی...';
+
+  try {
+    const url =
+      'https://api.coingecko.com/api/v3/simple/price' +
+      '?ids=bitcoin,ethereum,solana' +
+      '&vs_currencies=usd' +
+      '&include_24hr_change=true' +
+      '&include_last_updated_at=true';
+
+    const response = await fetch(url, {
+      headers: {
+        'x-cg-demo-api-key': apiKey.trim()
+      }
+    });
+
+    if (!response.ok) {
+      if (response.status === 401) {
+        throw new Error('کلید API نامعتبر است (401)');
+      }
+
+      if (response.status === 403) {
+        throw new Error('دسترسی API رد شد (403)');
+      }
+
+      if (response.status === 429) {
+        throw new Error('تعداد درخواست‌ها زیاد است (429)');
+      }
+
+      throw new Error('خطای سرور: ' + response.status);
+    }
+
+    const data = await response.json();
+
+    const coins = [
+      ['بیت‌کوین', 'bitcoin'],
+      ['اتریوم', 'ethereum'],
+      ['سولانا', 'solana']
+    ];
+
+    const fragment = document.createDocumentFragment();
+
+    for (const [name, id] of coins) {
+      const coin = data[id];
+
+      if (!coin || typeof coin.usd !== 'number') {
+        throw new Error('اطلاعات قیمت ' + name + ' ناقص است');
+      }
+
+      const p = document.createElement('p');
+
+      p.textContent = name + ': $' +
+        coin.usd.toLocaleString('en-US', {
+          maximumFractionDigits: 8
+        });
+
+      fragment.appendChild(p);
+
+      if (typeof coin.usd_24h_change === 'number') {
+        const change = document.createElement('small');
+
+        change.textContent =
+          'تغییر ۲۴ ساعته: ' +
+          coin.usd_24h_change.toFixed(2) + '%';
+
+        fragment.appendChild(change);
+        fragment.appendChild(document.createElement('br'));
+      }
+    }
+
+    const time = document.createElement('p');
+    time.textContent =
+      'آخرین دریافت: ' +
+      new Date().toLocaleTimeString('fa-IR');
+
+    fragment.appendChild(time);
+
+    box.replaceChildren(fragment);
+
+  } catch (error) {
+    console.error('CoinGecko:', error);
+
+    box.textContent = error.message.startsWith('خطای سرور') ||
+      error.message.includes('(401)') ||
+      error.message.includes('(403)') ||
+      error.message.includes('(429)')
+      ? error.message
+      : 'قیمت دریافت نشد. اینترنت، کلید API و اجرای فایل را بررسی کن.';
+
+  } finally {
+    isLoadingPrices = false;
+  }
 }
 
 loadCryptoPrice();
