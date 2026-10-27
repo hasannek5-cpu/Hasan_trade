@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
@@ -11,15 +12,23 @@ input,button{padding:13px;margin:7px;border:0;border-radius:8px;font-size:16px}
 input{width:80%;box-sizing:border-box}
 button{color:white;background:#16a34a}
 .sell{background:#dc2626}
-p{font-size:18px}
+p{font-size:16px}
 </style>
 </head>
 <body>
 <h1>💹 حسن ترید</h1>
-<p>پنل آزمایشی خرید و فروش ارز دیجیتال</p>
+<p>قیمت واقعی بازار + معاملات آزمایشی</p>
+
 <div class="card">
+<h3>قیمت ارزها</h3>
+<div id="realPrices">در حال دریافت قیمت...</div>
+<button onclick="loadCryptoPrice()">به‌روزرسانی قیمت</button>
+</div>
+
+<div class="card">
+<h3>معامله آزمایشی</h3>
 <label>قیمت ارز (دلار):</label><br>
-<input id="price" type="number" placeholder="مثلاً 65000"><br>
+<input id="price" type="number" placeholder="قیمت را وارد کن"><br>
 <label>مقدار ارز:</label><br>
 <input id="amount" type="number" placeholder="مثلاً 0.01"><br>
 <button onclick="trade('خرید')">خرید آزمایشی</button>
@@ -27,94 +36,62 @@ p{font-size:18px}
 <p id="result">آماده شروع معامله</p>
 <p id="balance">موجودی آزمایشی: 10000 دلار</p>
 </div>
+
 <div class="card">
 <h3>تاریخچه معاملات</h3>
 <div id="history">هنوز معامله‌ای انجام نشده</div>
 </div>
+
 <script>
 let balance=10000;
+
+async function loadCryptoPrice(){
+ const box=document.getElementById('realPrices');
+ box.innerText='در حال دریافت قیمت...';
+ try{
+  const response=await fetch(
+   'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=usd'
+  );
+  if(!response.ok) throw new Error('API');
+  const data=await response.json();
+  box.innerHTML=
+   '<p>بیت‌کوین: $'+data.bitcoin.usd.toLocaleString('en-US')+'</p>'+
+   '<p>اتریوم: $'+data.ethereum.usd.toLocaleString('en-US')+'</p>'+
+   '<small>آخرین دریافت: '+new Date().toLocaleTimeString('fa-IR')+'</small>';
+ }catch(e){
+  box.innerText='قیمت دریافت نشد. اینترنت یا محدودیت API را بررسی کن.';
+ }
+}
+
 function trade(type){
-let p=Number(document.getElementById('price').value);
-let a=Number(document.getElementById('amount').value);
-if(p<=0||a<=0){alert('قیمت و مقدار را درست وارد کن');return}
-let total=p*a;
-if(type==='خرید'){
-if(total>balance){alert('موجودی آزمایشی کافی نیست');return}
-balance-=total;
-}else{
-balance+=total;
-}
-document.getElementById('result').innerText=
-type+' آزمایشی: '+total.toFixed(2)+' دلار';
-document.getElementById('balance').innerText=
-'موجودی آزمایشی: '+balance.toFixed(2)+' دلار';
-let h=document.getElementById('history');
-if(h.innerText==='هنوز معامله‌ای انجام نشده')h.innerText='';
-h.innerHTML='<p>'+type+' | قیمت: '+p+' | مقدار: '+a+
-' | مبلغ: '+total.toFixed(2)+' دلار</p>'+h.innerHTML;
-}
-</script>
-<script>
-async function loadCryptoPrice() {
-  const url = "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=usd";
-  try {
-    const response = await fetch(url);
-    if (!response.ok) throw new Error("API error");
-    const data = await response.json();
-
-    let box = document.getElementById("realPrices");
-    if (!box) {
-      box = document.createElement("div");
-      box.id = "realPrices";
-      box.style.cssText =
-        "background:#1e293b;padding:15px;margin:15px;border-radius:12px;color:white";
-      document.body.appendChild(box);
-    }
-
-    box.innerHTML =
-      "<h3>قیمت لحظه‌ای ارزها (دلار)</h3>" +
-      "<p>بیت‌کوین: $" + data.bitcoin.usd.toLocaleString("en-US") + "</p>" +
-      "<p>اتریوم: $" + data.ethereum.usd.toLocaleString("en-US") + "</p>" +
-      "<small>قیمت ممکن است با تأخیر به‌روزرسانی شود.</small>";
-  } catch (error) {
-    console.error(error);
-    alert("دریافت قیمت ناموفق بود؛ اتصال اینترنت یا محدودیت API را بررسی کن.");
+ const p=Number(document.getElementById('price').value);
+ const a=Number(document.getElementById('amount').value);
+ if(!Number.isFinite(p)||!Number.isFinite(a)||p<=0||a<=0){
+  alert('قیمت و مقدار معتبر وارد کن');return;
+ }
+ const total=p*a;
+ if(type==='خرید'){
+  if(total>balance){
+   alert('موجودی آزمایشی کافی نیست');return;
   }
+  balance-=total;
+ }else{
+  balance+=total;
+ }
+ document.getElementById('result').innerText=
+  type+' آزمایشی: '+total.toFixed(2)+' دلار';
+ document.getElementById('balance').innerText=
+  'موجودی آزمایشی: '+balance.toFixed(2)+' دلار';
+ const h=document.getElementById('history');
+ if(h.innerText==='هنوز معامله‌ای انجام نشده')h.innerHTML='';
+ const row=document.createElement('p');
+ row.textContent=type+' | قیمت: '+p+' | مقدار: '+a+
+  ' | مبلغ: '+total.toFixed(2)+' دلار';
+ h.prepend(row);
 }
+
 loadCryptoPrice();
-setInterval(loadCryptoPrice, 60000);
+setInterval(loadCryptoPrice,60000);
 </script>
-  
-<script>
-async function loadCryptoPrice() {
-  const url = "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=usd";
-  try {
-    const response = await fetch(url);
-    if (!response.ok) throw new Error("API error");
-    const data = await response.json();
-
-    let box = document.getElementById("realPrices");
-    if (!box) {
-      box = document.createElement("div");
-      box.id = "realPrices";
-      box.style.cssText =
-        "background:#1e293b;padding:15px;margin:15px;border-radius:12px;color:white";
-      document.body.appendChild(box);
-    }
-
-    box.innerHTML =
-      "<h3>قیمت لحظه‌ای ارزها (دلار)</h3>" +
-      "<p>بیت‌کوین: $" + data.bitcoin.usd.toLocaleString("en-US") + "</p>" +
-      "<p>اتریوم: $" + data.ethereum.usd.toLocaleString("en-US") + "</p>" +
-      "<small>قیمت ممکن است با تأخیر به‌روزرسانی شود.</small>";
-  } catch (error) {
-    console.error(error);
-    alert("دریافت قیمت ناموفق بود؛ اتصال اینترنت یا محدودیت API را بررسی کن.");
-  }
-}
-loadCryptoPrice();
-setInterval(loadCryptoPrice, 60000);
-</script>
-
 </body>
 </html>
