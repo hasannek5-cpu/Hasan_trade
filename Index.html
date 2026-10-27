@@ -54,5 +54,67 @@ h.innerHTML='<p>'+type+' | قیمت: '+p+' | مقدار: '+a+
 ' | مبلغ: '+total.toFixed(2)+' دلار</p>'+h.innerHTML;
 }
 </script>
+<script>
+async function loadCryptoPrice() {
+  const url = "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=usd";
+  try {
+    const response = await fetch(url);
+    if (!response.ok) throw new Error("API error");
+    const data = await response.json();
+
+    let box = document.getElementById("realPrices");
+    if (!box) {
+      box = document.createElement("div");
+      box.id = "realPrices";
+      box.style.cssText =
+        "background:#1e293b;padding:15px;margin:15px;border-radius:12px;color:white";
+      document.body.appendChild(box);
+    }
+
+    box.innerHTML =
+      "<h3>قیمت لحظه‌ای ارزها (دلار)</h3>" +
+      "<p>بیت‌کوین: $" + data.bitcoin.usd.toLocaleString("en-US") + "</p>" +
+      "<p>اتریوم: $" + data.ethereum.usd.toLocaleString("en-US") + "</p>" +
+      "<small>قیمت ممکن است با تأخیر به‌روزرسانی شود.</small>";
+  } catch (error) {
+    console.error(error);
+    alert("دریافت قیمت ناموفق بود؛ اتصال اینترنت یا محدودیت API را بررسی کن.");
+  }
+}
+loadCryptoPrice();
+setInterval(loadCryptoPrice, 60000);
+</script>
+  
+<script>
+async function loadCryptoPrice() {
+  const url = "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=usd";
+  try {
+    const response = await fetch(url);
+    if (!response.ok) throw new Error("API error");
+    const data = await response.json();
+
+    let box = document.getElementById("realPrices");
+    if (!box) {
+      box = document.createElement("div");
+      box.id = "realPrices";
+      box.style.cssText =
+        "background:#1e293b;padding:15px;margin:15px;border-radius:12px;color:white";
+      document.body.appendChild(box);
+    }
+
+    box.innerHTML =
+      "<h3>قیمت لحظه‌ای ارزها (دلار)</h3>" +
+      "<p>بیت‌کوین: $" + data.bitcoin.usd.toLocaleString("en-US") + "</p>" +
+      "<p>اتریوم: $" + data.ethereum.usd.toLocaleString("en-US") + "</p>" +
+      "<small>قیمت ممکن است با تأخیر به‌روزرسانی شود.</small>";
+  } catch (error) {
+    console.error(error);
+    alert("دریافت قیمت ناموفق بود؛ اتصال اینترنت یا محدودیت API را بررسی کن.");
+  }
+}
+loadCryptoPrice();
+setInterval(loadCryptoPrice, 60000);
+</script>
+
 </body>
 </html>
