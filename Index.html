@@ -1,1 +1,58 @@
-<!DOCTYPE html> <html lang="fa" dir="rtl"> <head> <meta charset="UTF-8"> <meta name="viewport" content="width=device-width, initial-scale=1"> <title>حسن ترید</title> <style> body{font-family:Arial;background:#101827;color:white;text-align:center;padding:20px} .card{background:#1f2d40;padding:20px;border-radius:16px;margin-top:20px} input,button{width:100%;box-sizing:border-box;padding:14px;margin:8px 0;border:0;border-radius:10px;font-size:17px} button{color:white;background:#16a34a;font-weight:bold} .sell{background:#dc2626} p{font-size:18px} </style> </head> <body> <h1>📈 حسن ترید</h1> <p>پنل آزمایشی خرید و فروش ارز دیجیتال</p> <div class="card"> <label>قیمت ارز دیجیتال (دلار)</label> <input id="price" type="number" placeholder="مثلاً 65000"> <label>مبلغ معامله (دلار)</label> <input id="amount" type="number" placeholder="مثلاً 100"> <button onclick="trade('خرید')">خرید آزمایشی</button> <button class="sell" onclick="trade('فروش')">فروش آزمایشی</button> <p id="result">هنوز معامله‌ای انجام نشده است.</p> </div> <script> function trade(type){ let p=Number(document.getElementById('price').value); let a=Number(document.getElementById('amount').value); if(p<=0||a<=0){ document.getElementById('result').textContent='قیمت و مبلغ را درست وارد کن.'; return; } document.getElementById('result').textContent= type+' آزمایشی ثبت شد | قیمت: '+p+' دلار | مبلغ: '+a+' دلار'; } </script> </body> </html> 
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>حسن ترید</title>
+<style>
+body{background:#101827;color:white;font-family:tahoma;text-align:center;padding:15px}
+.card{background:#1e293b;padding:20px;border-radius:15px;margin:15px 0}
+input,button{padding:13px;margin:7px;border:0;border-radius:8px;font-size:16px}
+input{width:80%;box-sizing:border-box}
+button{color:white;background:#16a34a}
+.sell{background:#dc2626}
+p{font-size:18px}
+</style>
+</head>
+<body>
+<h1>💹 حسن ترید</h1>
+<p>پنل آزمایشی خرید و فروش ارز دیجیتال</p>
+<div class="card">
+<label>قیمت ارز (دلار):</label><br>
+<input id="price" type="number" placeholder="مثلاً 65000"><br>
+<label>مقدار ارز:</label><br>
+<input id="amount" type="number" placeholder="مثلاً 0.01"><br>
+<button onclick="trade('خرید')">خرید آزمایشی</button>
+<button class="sell" onclick="trade('فروش')">فروش آزمایشی</button>
+<p id="result">آماده شروع معامله</p>
+<p id="balance">موجودی آزمایشی: 10000 دلار</p>
+</div>
+<div class="card">
+<h3>تاریخچه معاملات</h3>
+<div id="history">هنوز معامله‌ای انجام نشده</div>
+</div>
+<script>
+let balance=10000;
+function trade(type){
+let p=Number(document.getElementById('price').value);
+let a=Number(document.getElementById('amount').value);
+if(p<=0||a<=0){alert('قیمت و مقدار را درست وارد کن');return}
+let total=p*a;
+if(type==='خرید'){
+if(total>balance){alert('موجودی آزمایشی کافی نیست');return}
+balance-=total;
+}else{
+balance+=total;
+}
+document.getElementById('result').innerText=
+type+' آزمایشی: '+total.toFixed(2)+' دلار';
+document.getElementById('balance').innerText=
+'موجودی آزمایشی: '+balance.toFixed(2)+' دلار';
+let h=document.getElementById('history');
+if(h.innerText==='هنوز معامله‌ای انجام نشده')h.innerText='';
+h.innerHTML='<p>'+type+' | قیمت: '+p+' | مقدار: '+a+
+' | مبلغ: '+total.toFixed(2)+' دلار</p>'+h.innerHTML;
+}
+</script>
+</body>
+</html>
