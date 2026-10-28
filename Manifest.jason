@@ -13,6 +13,20 @@
   "background_color": "#101827",
   "theme_color": "#101827",
   "icons": [
+"icons": [
+  {
+    "src": "/Hasan_trade/512.png",
+    "sizes": "512x512",
+    "type": "image/png",
+    "purpose": "any"
+  },
+  {
+    "src": "/Hasan_trade/912.png",
+    "sizes": "912x912",
+    "type": "image/png",
+    "purpose": "any"
+  }
+]
     {
       "src": "icon-912.png",
       "sizes": "912x912",
